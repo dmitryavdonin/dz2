@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+   name: my-deploy
+   labels:
+      app: my-app
+      env: dev
+      owner: DmitryAvdonin
+spec:
+   replicas: 2
+   selector:
+      matchLabels:
+         project: adv
+   strategy:
+      type: RollingUpdate
+      rollingUpdate:
+         maxUnavailable: 1
+         maxSurge: 1
+   template:
+      metadata:
+         labels:
+            project: adv
+      spec:
+         containers:
+            - name: adv-health
+              image: dmitryavdonin/health:latest
+              ports:
+                 - containerPort: 8000
+              livenessProbe:
+                 httpGet:
+                    path: /health
+                    port: 8000
+                 initialDelaySeconds: 5
+                 periodSeconds: 15
+                 failureThreshold: 1
